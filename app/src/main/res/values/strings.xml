@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">JetpackComposeApp</string>
+    <string name="search_bar_title">Restaurant, Cuisine or a Dish</string>
+    <string name="restaurants_near_you">Restaurants Near You</string>
 </resources>
