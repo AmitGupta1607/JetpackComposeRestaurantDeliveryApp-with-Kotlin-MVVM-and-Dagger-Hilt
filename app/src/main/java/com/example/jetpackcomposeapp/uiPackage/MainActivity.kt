@@ -1,6 +1,7 @@
 package com.example.jetpackcomposeapp.uiPackage
 
 import android.os.Bundle
+import android.view.Gravity
 import android.widget.HorizontalScrollView
 import android.widget.StackView
 import android.widget.TextView
@@ -22,11 +23,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,6 +45,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.*
 import coil.imageLoader
 import com.example.jetpackcomposeapp.AppColors
 import com.example.jetpackcomposeapp.R
@@ -54,6 +54,8 @@ import com.example.jetpackcomposeapp.data.models.BannersReponse
 import com.example.jetpackcomposeapp.data.models.RestaurantListResponse
 import com.example.jetpackcomposeapp.font.FontConstants
 import com.example.jetpackcomposeapp.ui.theme.JetpackComposeAppTheme
+import com.google.android.material.bottomnavigation.BottomNavigationItemView
+import com.google.android.material.bottomnavigation.BottomNavigationMenu
 import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.accompanist.coil.CoilImage
 
@@ -73,33 +75,115 @@ class MainActivity : AppCompatActivity() {
             JetpackComposeAppTheme {
 
                 // A surface container using the 'background' color from the theme
-
+                val navHostController= rememberNavController()
                 Surface(color = MaterialTheme.colors.background,
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()) {
-                    Box(modifier = Modifier
+                    Scaffold(modifier = Modifier
                         .fillMaxHeight()
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
 
-                    ){
-                    Column (){
-                        getToolbar()
-                        getSearchCard()
-                        getFiltersList()
-//                            showBanners(mainActivityViewModel = mainActivityViewModel)
-                            showRestaurantsList(mainActivityViewModel = mainActivityViewModel)
+                        topBar = {
+                            getToolbar()
+                        },
+
+                        bottomBar = {
+                            val listScreens = listOf(Screen.Home,Screen.Catalogue,Screen.Account)
+
+
+                            showNavBottomBar(navHostController = navHostController, listScreens = listScreens)
+
+
+                        }
+                        ,) {
+
+                        screenController(navHostController = navHostController, mainActivityViewModel =
+                        mainActivityViewModel)
                     }
 
                 }
             }
             }
         }
+    }
+
+@Composable
+fun showNavBottomBar(navHostController: NavHostController,
+ listScreens:List<Screen>){
+    BottomNavigation (
+        contentColor = Color.White,
+
+        ){
+        val navBackStackEntry by navHostController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE)
+
+        listScreens.forEach {screen ->
+            BottomNavigationItem(
+                icon ={Icon(imageVector = screen.icon,"This is icon",
+                    tint = Color.Black)},
 
 
+                selected= currentRoute==screen.route,
+                modifier=Modifier.background(Color.White),
+                label = {Text(text=screen.label,color = Color.Black,
+                    style= TextStyle(fontFamily = FontConstants.fontFamilyPoppins,
+                        fontWeight = FontWeight.Medium,fontSize = 15.sp))
+                },
+                onClick = {
+//                                            navHostController.popBackStack(
+//                                                navHostController.graph.startDestination,false
+//                                            )
+//                                            if
+//                                            (currentRoute!=it.route){
+
+                    navHostController.navigate(screen.route)
+//                                            }
+                }
+            )
+        }
 
     }
+
 }
+
+
+
+@Composable
+fun homeScreen(mainActivityViewModel: MainActivityViewModel){
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .fillMaxHeight()) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(top = 250.dp)
+        ) {
+            showProgress(mainActivityViewModel.loading.value)
+        }
+        Column {
+            getSearchCard()
+            getFiltersList()
+            val collectionsCompose=CollectionsCompose()
+
+
+//                            showBanners(mainActivityViewModel = mainActivityViewModel)
+            showRestaurantsList(mainActivityViewModel = mainActivityViewModel)
+        }
+    }
+
+}
+
+@Composable
+fun showProgress(isVisible:Boolean){
+    if(isVisible) {
+        CircularProgressIndicator()
+    }
+
+}
+
 
  @Composable
  fun showBanners(mainActivityViewModel: MainActivityViewModel){
@@ -132,7 +216,7 @@ fun getBannersList(bannerResponse: BannersReponse){
 }
 
 @Composable
-fun showRestaurantsList( restaurantListResponse:RestaurantListResponse,mainActivityViewModel: MainActivityViewModel) {
+fun showRestaurantsList( restaurantListResponse:RestaurantListResponse,mainActivityViewModel: MainActivityViewModel, ) {
     LazyColumn(
         modifier = Modifier
             .fillMaxHeight()
@@ -152,6 +236,8 @@ fun showRestaurantsList( restaurantListResponse:RestaurantListResponse,mainActiv
             getRestaurantCardItem(restaurantListItem = item)
         }
     }
+    
+
 }
 
 
@@ -253,7 +339,7 @@ fun getRestaurantCardItem(restaurantListItem:RestaurantListResponse.RestaurantLi
                 Text(
                     text = restaurantListItem.rating,
                     Modifier
-                        .padding(end = 20.dp,top=10.dp)
+                        .padding(end = 20.dp, top = 10.dp)
                         .height(20.dp),
                     style = TextStyle(
                         color = colorResource(id = R.color.green), fontWeight = FontWeight.Bold,
@@ -265,7 +351,7 @@ fun getRestaurantCardItem(restaurantListItem:RestaurantListResponse.RestaurantLi
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 2.dp,bottom=25.dp,end=20.dp),
+                    .padding(top = 2.dp, bottom = 25.dp, end = 20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
@@ -337,6 +423,24 @@ fun getFilter(filter:String){
             fontSize = 12.sp,fontFamily = FontConstants.fontFamilyPoppins)
 
 
+    }
+
+}
+
+@Composable
+fun screenController(navHostController: NavHostController,startDestination:String="restaurants",
+mainActivityViewModel: MainActivityViewModel){
+    NavHost(navController = navHostController, startDestination=Screen.Home.route ){
+        composable(Screen.Home.route){
+            homeScreen(mainActivityViewModel = mainActivityViewModel)
+        }
+        composable(Screen.Catalogue.route){
+            val collectionsCompose = CollectionsCompose()
+            collectionsCompose.showCatalogScreen(mainActivityViewModel = mainActivityViewModel)
+        }
+        composable(Screen.Account.route){
+            homeScreen(mainActivityViewModel = mainActivityViewModel)
+        }
     }
 }
 

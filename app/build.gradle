@@ -63,6 +63,7 @@ dependencies {
 
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.0-alpha06'
     implementation 'androidx.activity:activity-compose:1.3.0-alpha02'
+    implementation "androidx.navigation:navigation-compose:1.0.0-alpha09"
 
     //dagger hilt dependencies
     implementation "com.google.dagger:hilt-android:2.33-beta"

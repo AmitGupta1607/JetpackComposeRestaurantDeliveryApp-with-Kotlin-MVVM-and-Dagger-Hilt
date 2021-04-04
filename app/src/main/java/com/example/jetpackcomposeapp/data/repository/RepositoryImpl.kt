@@ -1,19 +1,18 @@
-package com.example.jetpackcomposeapp.data
+package com.example.jetpackcomposeapp.data.repository
 
 import android.util.Log
-import android.widget.Toast
-import androidx.compose.animation.defaultDecayAnimationSpec
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.jetpackcomposeapp.data.apiService.DelivericiousApiService
 import com.example.jetpackcomposeapp.data.models.BannersReponse
+import com.example.jetpackcomposeapp.data.models.CollectionsResponse
 import com.example.jetpackcomposeapp.data.models.RestaurantListResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 
-class RepositoryImpl(var retrofit:Retrofit) :Repository{
+class RepositoryImpl(var retrofit:Retrofit) : Repository {
 
     var bannersReponseLiveData=
         MutableLiveData<BannersReponse>()
@@ -58,5 +57,24 @@ class RepositoryImpl(var retrofit:Retrofit) :Repository{
             }
         })
         return mutableLiveDataRestaurantList
+    }
+
+    override fun fetchCollections(): LiveData<CollectionsResponse> {
+        val mutableLiveData = MutableLiveData<CollectionsResponse>()
+        apiService.getCollectionsList().enqueue(object :Callback<CollectionsResponse>{
+            override fun onResponse(
+                call: Call<CollectionsResponse>?,
+                response: Response<CollectionsResponse>?
+            ) {
+                val body = response!!.body()
+                mutableLiveData.postValue(body)
+            }
+
+            override fun onFailure(call: Call<CollectionsResponse>?, t: Throwable?) {
+            }
+        })
+
+        return mutableLiveData
+
     }
 }

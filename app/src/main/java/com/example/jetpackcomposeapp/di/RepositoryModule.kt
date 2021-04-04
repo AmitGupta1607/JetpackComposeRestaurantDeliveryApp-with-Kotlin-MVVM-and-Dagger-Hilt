@@ -1,7 +1,7 @@
 package com.example.jetpackcomposeapp.di
 
-import com.example.jetpackcomposeapp.data.Repository
-import com.example.jetpackcomposeapp.data.RepositoryImpl
+import com.example.jetpackcomposeapp.data.repository.Repository
+import com.example.jetpackcomposeapp.data.repository.RepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,7 +17,7 @@ object RepositoryModule{
 
     @Singleton
     @Provides
-    fun getRepository(retrofit: Retrofit):Repository{
+    fun getRepository(retrofit: Retrofit): Repository {
         return RepositoryImpl(retrofit = retrofit)
     }
 

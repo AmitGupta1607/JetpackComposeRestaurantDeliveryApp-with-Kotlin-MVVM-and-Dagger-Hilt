@@ -2,6 +2,7 @@ package com.example.jetpackcomposeapp.data.apiService
 
 
 import com.example.jetpackcomposeapp.data.models.BannersReponse
+import com.example.jetpackcomposeapp.data.models.CollectionsResponse
 import com.example.jetpackcomposeapp.data.models.RestaurantListResponse
 import retrofit2.Call
 import retrofit2.http.GET
@@ -16,5 +17,8 @@ interface DelivericiousApiService {
     //restaurants list
     @GET("def344c4-0172-4d5e-bd9f-cae1b1ca9ad7")
     fun getRestaurantList():Call<RestaurantListResponse>
+
+    @GET("db486478-022a-47b6-b1cf-c8a7ded23267")
+    fun getCollectionsList():Call<CollectionsResponse>
 
 }
